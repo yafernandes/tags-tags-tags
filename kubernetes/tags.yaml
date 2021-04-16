@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tags
+  labels:
+    tags.ese.datadog.com/origem: namespace
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tags
+  namespace: tags
+  labels:
+    app.kubernetes.io/name: tags
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tags
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tags
+        admission.datadoghq.com/enabled: "true"
+        tags.datadoghq.com/service: tags
+        tags.datadoghq.com/version: "0.1"
+        tags.ese.datadog.com/origem: label
+      annotations:
+        tags.ese.datadog.com/origem: annotation
+    spec:
+      containers:
+      - name: tags
+        image: yaalexf/tags
+        imagePullPolicy: Always
+        env:
+        - name: DD_TAGS
+          value: origem:tracer
